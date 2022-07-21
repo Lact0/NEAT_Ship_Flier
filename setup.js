@@ -261,6 +261,31 @@ class Game {
     ctx.fillText('Score:' + this.score, this.screen.xStart, this.screen.yStart);
   }
 
+  getInput() {
+    const target = this.targets[this.curTarget];
+    let mn = {'mag': 100000};
+    let minInd = 0;
+    for(let i = 0; i < 5; i++) {
+      const pos = new Vector(this.pos.x + DIR[i], this.pos.y + DIR[i + 1]);
+      const direction = new Vector(target.x, target.y, pos.x, pos.y);
+      if(direction.mag < mn.mag) {
+        mn = direction;
+        minInd = i;
+      }
+    }
+    const ret = [mn.x, mn.y];
+    let angle = radToDeg(Math.atan(mn.y / mn.x));
+    if(mn.x < 0) {
+      angle = 180 - angle;
+    }
+    angle += 360;
+    angle %= 360;
+    ret.push(angle);
+    ret.push(this.dir);
+    ret.push(this.vel.mag);
+    return ret;
+  }
+
   getBestLine() {
     const target = this.targets[this.curTarget];
     let mn = {'mag': 100000};
@@ -294,7 +319,7 @@ class Game {
     this.screen.toDraw.push(['line', pos2[0], pos2[1], pos3[0], pos3[1]], 1, 'white');
   }
 
-  step(left, up, down, right, space) {
+  step(left, up, down, right) {
     const force = new Vector();
     if(up) {
       const add = new Vector();

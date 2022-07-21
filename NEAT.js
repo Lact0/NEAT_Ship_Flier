@@ -127,7 +127,7 @@ class Neat {
       const species = this.species[this.curSpecies[i]][0];
       if(this.elitism && numChildren[i] > 0) {
         let mx = 0;
-        let mxNet = species[0];
+        let mxNet = this.pop[species[0]];
         for(let j = 0; j < species.length; j++) {
           const ind = species[j];
           if(this.fitness[ind] > mx) {
@@ -148,6 +148,8 @@ class Neat {
             const realInd = species[ind];
             n -= adjustedFitness[realInd];
           }
+          ind = max(0, ind);
+          ind = min(ind, this.pop.length - 1);
           parents.push(species[ind]);
         }
         if(this.fitness[parents[0]] < this.fitness[parents[1]]) {
@@ -157,7 +159,12 @@ class Neat {
         }
         parents[0] = this.pop[parents[0]];
         parents[1] = this.pop[parents[1]];
-        const child = parents[0].makeChild(parents[1]);
+        let child;
+        try {
+          child = parents[0].makeChild(parents[1]);
+        } catch {
+          console.log(parents[0], parents[1], this.pop)
+        }
 
         if(Math.random() < this.mutationRate) {
           child.mutate(this.globalInnovation, this.table, this.allowRecurrent);
